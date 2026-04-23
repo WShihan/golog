@@ -1,6 +1,8 @@
 <p align="center">
 <img src="./system/themes/default/assets/favicon.ico" alt="blblcd" style="width:3em;margin: 0px auto" /></p>
-Golog 一款复刻自 [Tualog](https://github.com/caris-events/tunalog) 的博客程序，在原项目基础上新增了如下特性：
+
+
+Golog 一款复刻自 [Tunalog](https://github.com/caris-events/tunalog) 的博客程序，在原项目基础上新增了如下特性：
 
 - 支持渲染 Mermaid 图表，Latex 表达式
 - 支持博文分类，随笔，时刻，日志
