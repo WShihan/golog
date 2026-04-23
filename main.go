@@ -4,27 +4,35 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime"
 
 	"github.com/thanhpk/randstr"
 	"github.com/urfave/cli/v2"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/caris-events/tunalog/handler"
-	"github.com/caris-events/tunalog/store"
-	"github.com/caris-events/tunalog/system"
+	"golog/entity"
+	"golog/handler"
+	"golog/store"
+)
+
+var (
+	Version   = ""
+	BuildTime = ""
+	Commit    = ""
 )
 
 func main() {
 	fmt.Println(`
-████████╗██╗   ██╗███╗   ██╗ █████╗ ██╗      ██████╗  ██████╗
-╚══██╔══╝██║   ██║████╗  ██║██╔══██╗██║     ██╔═══██╗██╔════╝
-   ██║   ██║   ██║██╔██╗ ██║███████║██║     ██║   ██║██║  ███╗
-   ██║   ╚██████╔╝██║ ╚████║██║  ██║███████╗╚██████╔╝╚██████╔╝
-   ╚═╝    ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝ ╚═════╝  ╚═════╝`)
+                  _                 
+   __ _    ___   | |   ___     __ _ 
+  / _  |  / _ \  | |  / _ \   / _  |
+ | (_) | | (_) | | | | (_) | | (_) |
+  \__, |  \___/  |_|  \___/   \__, |
+  |___/                       |___/ `)
 
 	app := &cli.App{
-		Name:    "tunalog",
-		Version: system.Version,
+		Name:    "golog",
+		Version: fmt.Sprintf("Version: %s\tBuild Time: %s\tCommit: %s", Version, BuildTime, Commit),
 		Usage:   "A simple blogging system written in Golang ✨",
 		Action:  start,
 		Flags: []cli.Flag{
@@ -32,7 +40,7 @@ func main() {
 				Name:    "port",
 				Usage:   "port to listen on",
 				Aliases: []string{"p"},
-				Value:   ":8080",
+				Value:   ":5201",
 			},
 			&cli.StringFlag{
 				Name:  "tls-key",
@@ -59,13 +67,12 @@ func main() {
 }
 
 func start(c *cli.Context) error {
-	if c.String("tls-crt") != "" && c.String("tls-key") != "" {
-		fmt.Printf("👋 Visit https://localhost%s to use Tunalog\n", c.String("port"))
-		return handler.Router.RunTLS(c.String("port"), c.String("tls-crt"), c.String("tls-key"))
-	} else {
-		fmt.Printf("👋 Visit http://localhost%s to use Tunalog\n", c.String("port"))
-		return handler.Router.Run(c.String("port"))
-	}
+	return handler.Start(c, &entity.Injection{
+		Version:   Version,
+		BuildTime: BuildTime,
+		Commit:    Commit,
+		GoVersion: runtime.Version(),
+	})
 }
 
 func resetUser(c *cli.Context) error {

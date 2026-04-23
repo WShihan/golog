@@ -1,21 +1,25 @@
-module github.com/caris-events/tunalog
+module golog
 
 go 1.23.0
 
 require (
-	github.com/YamiOdymel/conform v1.0.0
 	github.com/YamiOdymel/multitemplate v1.0.3
 	github.com/gin-contrib/sessions v0.0.5
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-playground/validator/v10 v10.22.0
 	github.com/gomarkdown/markdown v0.0.0-20240626202925-2eda941fd024
 	github.com/google/uuid v1.6.0
+	github.com/leebenson/conform v1.2.2
+	github.com/litao91/goldmark-mathjax v0.0.0-20210217064022-a43cf739a50f
 	github.com/sunshineplan/imgconv v1.1.10
 	github.com/teacat/i18n v1.0.2
 	github.com/thanhpk/randstr v1.0.6
 	github.com/urfave/cli/v2 v2.27.2
 	github.com/utrack/gin-csrf v0.0.0-20190424104817-40fb8d2c8fca
 	github.com/writeas/go-strip-markdown v2.0.1+incompatible
+	github.com/yuin/goldmark v1.7.12
+	go.abhg.dev/goldmark/mermaid v0.5.0
+	go.abhg.dev/goldmark/toc v0.12.0
 	golang.org/x/crypto v0.26.0
 	golang.org/x/time v0.5.0
 	modernc.org/sqlite v1.32.0
@@ -29,6 +33,7 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.4 // indirect
 	github.com/dchest/uniuri v0.0.0-20160212164326-8902c56451e9 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/etgryphon/stringUp v0.0.0-20121020160746-31534ccd8cac // indirect
 	github.com/gabriel-vasile/mimetype v1.4.5 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
@@ -40,7 +45,6 @@ require (
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/hhrutter/lzw v1.0.0 // indirect
 	github.com/hhrutter/tiff v1.0.1 // indirect
-	github.com/iancoleman/strcase v0.2.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.8 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect

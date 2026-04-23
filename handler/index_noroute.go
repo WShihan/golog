@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"net/http"
 
-	"github.com/caris-events/tunalog/store"
-	"github.com/caris-events/tunalog/system"
+	"golog/store"
+	"golog/system"
+
 	"github.com/gin-gonic/gin"
 )
 

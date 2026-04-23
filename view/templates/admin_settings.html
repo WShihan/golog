@@ -37,6 +37,18 @@
                 </div>
                 <!-- / description -->
 
+                <!-- about -->
+                <div class="ts-control has-top-spaced-large">
+                    <div class="label">{{ __ "settings_about" }}</div>
+                    <div class="content">
+                        <div class="ts-input">
+                            <textarea type="text" name="about" >{{ .Config.About }}</textarea>
+                        </div>
+                        <div class="ts-text is-description has-top-spaced-small">{{ __ "settings_about_description" }}</div>
+                    </div>
+                </div>
+                <!-- / about -->
+
                 <!-- is_public -->
                 <div class="ts-control has-top-spaced-large">
                     <div class="label">{{ __ "settings_ispublic" }}</div>
@@ -170,18 +182,73 @@
         </div>
     </form>
 
-    <div class="ts-header has-top-spaced-big">{{ __ "settings_about" }}</div>
-    <div class="ts-content is-rounded is-tertiary is-very-padded has-top-spaced">
-        <div class="ts-grid is-middle-aligned is-relaxed">
-            <div class="column is-fluid">
-                <div class="ts-text is-description">
-                    <p>{{ _f "settings_versions" .Version .RuntimeVersion }}</p>
-                    {{ __ "settings_madeof" }}
+    <div class="ts-divider has-vertically-spaced-huge"></div>
+
+    <div class="ts-header">{{ __ "settings_about_license" }}</div>
+    <div class="ts-box has-top-spaced golog-about">
+        <div class="ts-content is-vertically-padded">
+            <div class="ts-control">
+                <div class="label"></div>
+                <div class="content">
+                    <div class="ts-text is-description">
+                        {{ __ "settings_license_golog" }}
+                    </div>
                 </div>
             </div>
-            <div class="column">
-                <div class="ts-image logo">
-                    <img src="{{ .URL.RelativeRoot }}admin/assets/caris-events.svg" width="120" alt="" />
+            <div class="ts-control">
+                <div class="content">
+                   <span>
+                        {{ __ "settings_golog_version" }}&nbsp;&nbsp;&nbsp;&nbsp;{{ .Version }}
+                    </span>
+                </div>
+                <div class="content">
+                    <span>
+                        {{ __ "settings_go_version" }}:&nbsp;&nbsp;&nbsp;&nbsp;{{ .RuntimeVersion }}
+                    </span>
+                </div>
+                <div class="content">
+                   <span>
+                        {{ __ "settings_golog_build_time" }}&nbsp;&nbsp;&nbsp;&nbsp;{{ .BuildTime }}
+                    </span>
+                </div>
+                <div class="content">
+                    <span>
+                        {{ __ "settings_golog_commit" }}&nbsp;&nbsp;&nbsp;&nbsp;{{ .Commit }}
+                    </span>
+                </div>
+                <div class="content">
+                    <span>
+                        {{ __ "settings_repo" }}&nbsp;&nbsp;&nbsp;&nbsp;{{ .GitHub | html}}
+                    </span>
+                </div>
+            </div>
+            <div class="ts-control has-top-spaced-large">
+                <div class="label">{{ __ "settings_license_thirdparty" }}</div>
+                <div class="content">
+                    <div class="ts-text is-description">
+                        <ul>
+                            <li><a href="https://github.com/gin-gonic/gin" target="_blank" rel="noopener noreferrer">gin-gonic/gin</a></li>
+                            <li><a href="https://github.com/gin-contrib/sessions" target="_blank" rel="noopener noreferrer">gin-contrib/sessions</a></li>
+                            <li><a href="https://github.com/utrack/gin-csrf" target="_blank" rel="noopener noreferrer">utrack/gin-csrf</a></li>
+                            <li><a href="https://github.com/go-playground/validator" target="_blank" rel="noopener noreferrer">go-playground/validator/v10</a></li>
+                            <li><a href="https://github.com/gomarkdown/markdown" target="_blank" rel="noopener noreferrer">gomarkdown/markdown</a></li>
+                            <li><a href="https://github.com/writeas/go-strip-markdown" target="_blank" rel="noopener noreferrer">writeas/go-strip-markdown</a></li>
+                            <li><a href="https://github.com/yuin/goldmark" target="_blank" rel="noopener noreferrer">yuin/goldmark</a></li>
+                            <li><a href="https://github.com/abhinav/goldmark-mermaid" target="_blank" rel="noopener noreferrer">go.abhg.dev/goldmark/mermaid</a></li>
+                            <li><a href="https://github.com/abhinav/goldmark-toc" target="_blank" rel="noopener noreferrer">go.abhg.dev/goldmark/toc</a></li>
+                            <li><a href="https://github.com/litao91/goldmark-mathjax" target="_blank" rel="noopener noreferrer">litao91/goldmark-mathjax</a></li>
+                            <li><a href="https://github.com/YamiOdymel/multitemplate" target="_blank" rel="noopener noreferrer">YamiOdymel/multitemplate</a></li>
+                            <li><a href="https://github.com/google/uuid" target="_blank" rel="noopener noreferrer">google/uuid</a></li>
+                            <li><a href="https://github.com/leebenson/conform" target="_blank" rel="noopener noreferrer">leebenson/conform</a></li>
+                            <li><a href="https://github.com/sunshineplan/imgconv" target="_blank" rel="noopener noreferrer">sunshineplan/imgconv</a></li>
+                            <li><a href="https://github.com/teacat/i18n" target="_blank" rel="noopener noreferrer">teacat/i18n</a></li>
+                            <li><a href="https://github.com/thanhpk/randstr" target="_blank" rel="noopener noreferrer">thanhpk/randstr</a></li>
+                            <li><a href="https://github.com/urfave/cli" target="_blank" rel="noopener noreferrer">urfave/cli/v2</a></li>
+                            <li><a href="https://github.com/golang/crypto" target="_blank" rel="noopener noreferrer">golang.org/x/crypto</a></li>
+                            <li><a href="https://github.com/golang/time" target="_blank" rel="noopener noreferrer">golang.org/x/time</a></li>
+                            <li><a href="https://gitlab.com/cznic/sqlite" target="_blank" rel="noopener noreferrer">modernc.org/sqlite</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>

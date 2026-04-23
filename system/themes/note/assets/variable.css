@@ -1,0 +1,117 @@
+:root {
+  --base-color: #175fab;
+  --main-bg-color: #fff;
+  --container-margin-top: 1em;
+  --code-bg-color: #cee5ff;
+  --input-bg-color: #dfeaee;
+  --base-main-bg-img:
+    linear-gradient(90deg,
+      transparent 1px,
+      rgba(0, 0, 0, 0.05) 1px,
+      rgba(188, 186, 186, 0.05) 1.5px,
+      rgba(221, 218, 218, 0.3) 1.5px),
+    linear-gradient(0deg,
+      transparent 1px,
+      rgba(0, 0, 0, 0.05) 1px,
+      rgba(188, 186, 186, 0.05) 1.5px,
+      rgba(221, 218, 218, 0.3) 1.5px);
+  --base-width: 700px;
+  --font-size: 13px;
+  --font-size-s: 12px;
+  --font-color: #363636;
+  --font-size-tip: 12px;
+  --container-margin: 1vh auto;
+  --container-padding-vertical: 1em;
+  --container-height-min: 80vh;
+  --toc-width: 10em;
+  --toc-height: 90vh;
+  --border-color: rgba(177, 193, 220, 0.342);
+  --note-top-height: 5em;
+  --note-body-gap: 5em;
+  --note-bottom: 1em;
+  --note-bottom-height: 3em;
+  --side-bar-bg: #175fab;
+  --nav-mobile-display: none;
+  --nav-icon-size: 15px;
+  --footer-icon-size: 12px;
+  --footer-padding-size: 1em;
+  --timeline-font-size: 10px;
+  --post-block-color: rgba(225, 225, 232, 0.36);
+  --moment-day-font-size: 40px;
+  --moment-date-font-size: 10px;
+  --sider-bg-color: rgba(231, 235, 240, 0.5);
+  --content-h-padding: 2em;
+  --link-visited: #6095cda3;
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  :root {
+    --base-width: 100vw;
+    --container-margin-top: 0em;
+    --font-size: 12px;
+    --font-size-s: 12px;
+    --font-size-tip: 10px;
+    --container-height-min: 100vh;
+    --container-margin: 0px;
+    --toc-width: 100vw;
+    --toc-height: 100vh;
+    --footer-icon-size: 14px;
+    --footer-padding-size: 3em;
+    --footer-icon-size: 16px;
+    --nav-mobile-display: flex;
+    --note-body-gap: 6em;
+  }
+}
+
+.small {
+  --base-width: 500px;
+
+}
+
+.medium {
+  --base-width: 700px;
+
+}
+
+.large {
+  --base-width: 1200px;
+
+}
+
+@media (min-width: 0px) and (max-width: 768px) {
+  :root {
+    --base-width: 100vw;
+    --container-margin-top: 0em;
+    --font-size: 16px;
+    --font-size-s: 14px;
+    --font-size-tip: 12px;
+    --container-height-min: 100vh;
+    --container-margin: 0px;
+    --toc-width: 100vw;
+    --toc-height: 100vh;
+    --footer-padding-size: 3em;
+    --footer-icon-size: 11.2px;
+    --nav-mobile-display: flex;
+    --note-top-height: 3em;
+    --note-body-gap: 3em;
+    --note-bottom: 0em;
+    --note-bottom-height: 1.5em;
+    --content-h-padding: 0.5em;
+  }
+}
+
+.dark {
+  --base-color: #175FAB;
+  --main-bg-color: #091524;
+  --font-color: #175FAB;
+  --base-main-bg-img: linear-gradient(90deg, transparent 1px, rgba(0, 0, 0, 0.05) 1px, rgba(188,
+        186, 186, 0.05) 1.5px, rgba(40, 55, 83, 0.3) 1.5px), linear-gradient(0deg,
+      transparent 1px, rgba(0, 0, 0, 0.05) 1px, rgba(188, 186, 186, 0.05) 1.5px,
+      rgba(86, 83, 83, 0.3) 1.5px);
+  --border-color: #283039;
+  --input-bg-color: rgba(27, 46, 73, 0.87);
+  --code-bg-color: rgba(27, 46, 73, 0.87);
+  --post-block-color: rgba(64, 64, 71, 0.36);
+  --side-bar-bg: rgba(27, 46, 73, 0.87);
+  --sider-bg-color: rgba(64, 65, 66, 0.5);
+}

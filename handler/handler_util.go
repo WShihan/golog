@@ -14,9 +14,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/caris-events/tunalog/entity"
-	"github.com/caris-events/tunalog/store"
-	"github.com/caris-events/tunalog/system"
+	"golog/entity"
+	"golog/store"
+	"golog/system"
+	"golog/util"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -114,7 +116,15 @@ func data(c *gin.Context, data gin.H) gin.H {
 	if c.Request.TLS == nil {
 		suffix = "http://"
 	}
+	stats, _ := store.GroupPostByMonth(util.BlogType)
+	momentStats, _ := store.GroupPostByYear(util.MomentType)
+	tagMap, _ := store.GroupPostByTag()
+	data["QUID"] = uuid.New().String()
 	data["Self"] = self
+	data["Stats"] = stats
+	data["MomentStats"] = momentStats
+	data["TagMap"] = tagMap
+	data["BlogTypes"] = map[string]string{util.MomentKey: util.MomentType, util.WhisperKey: util.WhisperType, util.BlogKey: util.BlogType}
 	data["Config"] = system.Config
 	data["Message"] = message(c)
 	data["CSRF"] = csrf.GetToken(c)
@@ -223,9 +233,18 @@ func savePhoto(c *gin.Context, file *multipart.FileHeader) (string, error) {
 		month     = time.Now().Format("01")
 		unix      = strconv.Itoa(int(time.Now().Unix()))
 		id        = uuid.New().String()
+		ext       = strings.ToLower(filepath.Ext(file.Filename))
 		localDst  = fmt.Sprintf("data/uploads/images/%s/%s/%s_%s.jpg", year, month, unix, id)
 		publicDst = fmt.Sprintf("uploads/images/%s/%s/%s_%s.jpg", year, month, unix, id)
 	)
+	if ext == ".ico" {
+		localDst = fmt.Sprintf("data/uploads/images/%s/%s/%s_%s.ico", year, month, unix, id)
+		publicDst = fmt.Sprintf("uploads/images/%s/%s/%s_%s.ico", year, month, unix, id)
+		if err := c.SaveUploadedFile(file, localDst); err != nil {
+			return "", err
+		}
+		return publicDst, nil
+	}
 	if err := c.SaveUploadedFile(file, localDst); err != nil {
 		return "", err
 	}

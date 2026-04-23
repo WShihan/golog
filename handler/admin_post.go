@@ -8,8 +8,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/caris-events/tunalog/entity"
-	"github.com/caris-events/tunalog/store"
+	"golog/entity"
+	"golog/store"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -30,6 +31,7 @@ func PostsView(c *gin.Context) {
 		visibility   = entity.Visibility(c.Query("visibility"))
 	)
 	q := &store.ListPostsQuery{
+		Type:          c.Query("type"),
 		Offset:        (page - 1) * countPerPage,
 		Limit:         countPerPage,
 		Title:         c.Query("title"),
@@ -45,7 +47,7 @@ func PostsView(c *gin.Context) {
 	if visibility == entity.VisibilityTrash {
 		q.IsTrashed = store.PtrBool(true)
 	}
-	posts, err := store.ListPosts(q)
+	posts, err := store.ListallPosts(q)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -55,7 +57,7 @@ func PostsView(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	counts, err := store.CountPostsByType()
+	counts, err := store.CountPostsByType(q.Type)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -109,6 +111,7 @@ func PostCreateView(c *gin.Context) {
 // ===============================
 
 type PostCreateRequest struct {
+	Type        string            `form:"type" binding:"required" conform:"trim"`
 	Title       string            `form:"title" binding:"required,max=128" conform:"trim"`
 	Slug        string            `form:"slug" binding:"required" conform:"trim"`
 	Excerpt     string            `form:"excerpt" conform:"trim"`
@@ -139,6 +142,7 @@ func PostCreate(c *gin.Context, req *PostCreateRequest) {
 	}
 	p := &entity.PostW{
 		ID:          pid,
+		Type:        req.Type,
 		Title:       req.Title,
 		Slug:        toSlug(req.Slug),
 		Excerpt:     req.Excerpt,
@@ -173,6 +177,7 @@ func PostCreate(c *gin.Context, req *PostCreateRequest) {
 // ===============================
 
 type PostEditViewObject struct {
+	Type              string            `json:"type"`
 	Visibility        entity.Visibility `json:"visibility"`
 	CoverImageURL     string            `json:"cover_image_url"`
 	Tags              []string          `json:"tags"`
@@ -201,6 +206,7 @@ func PostEditView(c *gin.Context) {
 		return
 	}
 	jsonData, err := json.Marshal(&PostEditViewObject{
+		Type:              post.Type,
 		Visibility:        post.Visibility,
 		CoverImageURL:     post.Cover(),
 		Tags:              post.TagNames(),
@@ -234,6 +240,7 @@ func PostEditView(c *gin.Context) {
 // ===============================
 
 type PostEditRequest struct {
+	Type         string            `form:"type" binding:"required" conform:"trim"`
 	Title        string            `form:"title" binding:"required,max=128" conform:"trim"`
 	Slug         string            `form:"slug" binding:"required" conform:"trim"`
 	Excerpt      string            `form:"excerpt" conform:"trim"`
@@ -265,6 +272,7 @@ func PostEdit(c *gin.Context, req *PostEditRequest) {
 	}
 	p := &entity.PostW{
 		ID:          id,
+		Type:        req.Type,
 		Title:       req.Title,
 		Slug:        toSlug(req.Slug),
 		Excerpt:     req.Excerpt,

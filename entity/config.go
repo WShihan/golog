@@ -26,6 +26,7 @@ const (
 type Config struct {
 	Name              string      `json:"name"`
 	Description       string      `json:"description"`
+	About             string      `json:"about"`
 	IsPublic          bool        `json:"is_public"`
 	DateFormat        string      `json:"date_format"`
 	TimeFormat        string      `json:"time_format"`
@@ -44,6 +45,7 @@ type Config struct {
 	PostsPerPage      int         `json:"posts_per_page"`
 	Theme             string      `json:"theme"`
 	Locale            string      `json:"locale"`
+	Favicon           string      `json:"favicon"`
 }
 
 func (c *Config) IsCustomTimeFormat() bool {

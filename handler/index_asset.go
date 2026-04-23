@@ -2,11 +2,13 @@ package handler
 
 import (
 	"fmt"
+	"io/fs"
 	"net/http"
-	"path/filepath"
+	"path"
 	"strings"
 
-	"github.com/caris-events/tunalog/system"
+	"golog/system"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,29 +21,14 @@ func AssetView(c *gin.Context) {
 	if system.Config != nil {
 		theme = system.Config.Theme
 	}
-	basePath := fmt.Sprintf("data/themes/%s/assets", theme)
-
-	absBasePath, err := filepath.Abs(basePath)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
 	asset := c.Param("asset")
-	filePath := filepath.Join(basePath, filepath.FromSlash(filepath.Clean(asset)))
 
-	resolvedPath, err := filepath.EvalSymlinks(filePath)
+	fsys, err := fs.Sub(system.ThemesFS, fmt.Sprintf("themes/%s/assets", theme))
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	absResolvedPath, err := filepath.Abs(resolvedPath)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-	if !strings.HasPrefix(absResolvedPath, absBasePath) {
-		c.AbortWithStatus(http.StatusForbidden)
-		return
-	}
-	c.File(absResolvedPath)
+	cleanAsset := path.Clean("/" + asset)
+	cleanAsset = strings.TrimPrefix(cleanAsset, "/")
+	c.FileFromFS(cleanAsset, http.FS(fsys))
 }

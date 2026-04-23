@@ -1,0 +1,18 @@
+{{ define "og" }}{{ end }}
+
+{{ define "head" }}
+<title>关于</title>
+<style>
+    .content {
+        flex-direction: column;
+    }
+</style>
+{{ end }}
+
+{{ define "content" }}
+
+<div class="content">
+    {{- md2html .Config.About -}}
+</div>
+
+{{ end }}

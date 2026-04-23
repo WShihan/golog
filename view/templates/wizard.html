@@ -3,14 +3,14 @@
     <head>
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocas/5.0.1/tocas.min.css" />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/tocas/5.0.1/tocas.min.js"></script>
+        <link rel="stylesheet" href="/admin/assets/admin.css" />
+        <script src="/admin/assets/admin.js"></script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&family=Noto+Sans+KR:wght@100..900&family=Noto+Sans+SC:wght@100..900&family=Noto+Sans+TC:wght@100..900&display=swap" rel="stylesheet">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <link rel="icon" type="image/png" href="{{ .URL.RelativeRoot }}assets/favicon.png">
-        <title>Tunalog</title>
+        {{ if and .Config .Config.Favicon }}<link rel="icon" href="{{ .Config.Favicon }}" type="image/x-icon" />{{ else }}<link rel="icon" type="image/png" href="{{ .URL.RelativeRoot }}assets/favicon.ico">{{ end }}
+        <title>Golog</title>
         <style>
             body {
                 font-family: "Noto Sans TC", "Noto Sans SC", "Noto Sans JP", "Noto Sans KR";
@@ -76,6 +76,15 @@
                             </div>
                             <!-- description -->
 
+                            <!-- about -->
+                            <div class="ts-control is-wide mobile:is-stacked has-top-spaced-large">
+                                <div class="label">{{ __ "settings_about" }}</div>
+                                <div class="content">
+                                    <div class="ts-input"><textarea type="text" name="about" >{{ __ "wizard_about_value" }}</textarea></div>
+                                    <div class="ts-text is-description has-top-spaced-small">{{ __ "wizard_about_description" }}</div>
+                                </div>
+                            </div>
+                            <!-- about -->
                             <!-- timezone -->
                             <input type="hidden" id="timezone-input" name="timezone" value="" />
                             <!-- / timezone -->

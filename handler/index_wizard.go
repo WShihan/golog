@@ -4,9 +4,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/caris-events/tunalog/entity"
-	"github.com/caris-events/tunalog/store"
-	"github.com/caris-events/tunalog/system"
+	"golog/entity"
+	"golog/store"
+	"golog/system"
+	"golog/util"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/teacat/i18n"
@@ -45,6 +47,8 @@ func WizardView(c *gin.Context) {
 type WizardRequest struct {
 	Name        string `form:"name" binding:"required,min=1,max=48" conform:"trim"`
 	Description string `form:"description" binding:"omitempty,max=128" conform:"trim"`
+	About       string `form:"about" binding:"omitempty"`
+	Start       int    `form:"start" binding:"omitempty"`
 	Email       string `form:"email" binding:"required,email" conform:"trim"`
 	Password    string `form:"password" binding:"required,min=1,max=128"`
 	Nickname    string `form:"nickname" binding:"required,min=1,max=32" conform:"trim"`
@@ -73,6 +77,7 @@ func Wizard(c *gin.Context, req *WizardRequest) {
 	system.Config = &entity.Config{
 		Name:              req.Name,
 		Description:       req.Description,
+		About:             req.About,
 		IsPublic:          true,
 		DateFormat:        "2006-01-02",
 		TimeFormat:        "15:04",
@@ -81,7 +86,7 @@ func Wizard(c *gin.Context, req *WizardRequest) {
 		InjectedFoot:      "",
 		InjectedPostStart: "",
 		InjectedPostEnd:   "",
-		FooterText:        `Powered by <a href="https://tunalog.org" target="_blank">Tunalog</a> 🐟`,
+		FooterText:        `Powered by <a href="https://github.com/WShihan/golog">Golog</a>`,
 		ColorScheme:       entity.ColorSchemeAuto,
 		ContainerWidth:    "medium",
 		FontFamily:        entity.FontFamilyNotoSans,
@@ -99,6 +104,7 @@ func Wizard(c *gin.Context, req *WizardRequest) {
 
 	// default post <3
 	p := &entity.PostW{
+		Type:        util.BlogType,
 		ID:          uuid.New().String(),
 		Title:       system.Locale.String("defaultpost_title"),
 		Slug:        "hello-world",

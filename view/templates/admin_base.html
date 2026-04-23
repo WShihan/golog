@@ -3,13 +3,14 @@
     <head>
         <meta charset="UTF-8" />
         <title>{{ _f "title_admin" .Config.Name }}</title>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocas/5.0.1/tocas.min.css" />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/tocas/5.0.1/tocas.min.js"></script>
+        <link rel="stylesheet" href="/admin/assets/admin.css" />
+        <script src="/admin/assets/admin.js"></script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&family=Noto+Sans+KR:wght@100..900&family=Noto+Sans+SC:wght@100..900&family=Noto+Sans+TC:wght@100..900&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="{{ .URL.RelativeRoot }}admin/assets/style.css" />
-        <link rel="icon" type="image/png" href="{{ .URL.RelativeRoot }}assets/favicon.png">
+        {{ if .Config.Favicon }}<link rel="icon" href="{{ .Config.Favicon }}" type="image/x-icon" />{{ else }}<link rel="icon" href="/assets/favicon.ico" type="image/x-icon" />{{ end }}
+
     </head>
     <body>
         <div class="ts-app-layout is-fullscreen is-horizontal">

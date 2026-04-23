@@ -1,0 +1,42 @@
+{{ define "og" }}{{ end }}
+
+{{ define "head" }}
+<title>日志</title>
+{{ end }}
+
+{{ define "content" }}
+    {{ range .Posts}}
+    <div class="post-list">
+        <div class="post-item">
+            <div class="post-item-body">
+                <div class="body-text ">
+                    <div class="intro">{{- md2html .Content -}}</div>
+                </div>
+            </div>
+            <div class="post-item-timeline">
+                <div class="timeline">
+                <span>☉</span>
+                <span class="timeline-date">{{ .PublishedAt | unix2date -}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{ end }}
+    {{ if gt .Pagination.TotalPages 1 }}
+    <div class="pagination is-secondary" >
+        {{ if gt .Pagination.CurrentPage 1 }}
+        <a href="?{{ .Pagination.Query }}page={{ sub .Pagination.CurrentPage 1 }}" class="item">{{ __ "pagination_new" }}</a>
+        {{ else }}
+        <span class="item is-disabled">{{ __ "pagination_new" }}</span>
+        {{ end }}
+
+        <span class="item is-active">{{ _f "pagination_info" .Pagination.CurrentPage .Pagination.TotalPages }}</span>
+
+        {{ if lt .Pagination.CurrentPage .Pagination.TotalPages }}
+        <a href="?{{ .Pagination.Query }}page={{ add .Pagination.CurrentPage 1 }}" class="item">{{ __ "pagination_old" }}</a>
+        {{ else }}
+        <span class="item is-disabled">{{ __ "pagination_old" }}</span>
+        {{ end }}
+    </div>
+    {{ end }}
+{{ end }}

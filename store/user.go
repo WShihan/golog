@@ -1,7 +1,7 @@
 package store
 
 import (
-	"github.com/caris-events/tunalog/entity"
+	"golog/entity"
 )
 
 func createUserTable() error {

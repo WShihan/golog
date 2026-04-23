@@ -3,7 +3,7 @@ package store
 import (
 	"database/sql"
 
-	"github.com/caris-events/tunalog/entity"
+	"golog/entity"
 )
 
 func createTagTable() error {

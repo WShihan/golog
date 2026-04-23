@@ -1,0 +1,7 @@
+.outer {
+  flex: 1;
+}
+
+.post-item:last-child {
+  border-bottom: none;
+}

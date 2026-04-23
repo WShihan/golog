@@ -1,5 +1,11 @@
 db.sqlite
 config.json
-tunalog
+golog
 data
 bin
+build/
+__debug*
+.claude/
+*.sqlite
+.worktrees
+CLAUDE.md

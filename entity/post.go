@@ -19,7 +19,17 @@ const (
 	VisibilityPassword Visibility = "password"
 	VisibilityDraft    Visibility = "draft"
 	VisibilityTrash    Visibility = "trash" // trash doesn't really exists, it's an abstraction
+
 )
+
+var (
+	MonthSimp = map[string]string{}
+)
+
+func Init() {
+	MonthSimp["o1"] = "Jan"
+
+}
 
 type PostCount struct {
 	All      int
@@ -32,6 +42,7 @@ type PostCount struct {
 }
 
 type PostW struct {
+	Type        string
 	ID          string
 	Title       string
 	Slug        string
@@ -50,6 +61,7 @@ type PostW struct {
 }
 
 type PostR struct {
+	Type            string
 	ID              string
 	Title           string
 	Slug            string
@@ -102,6 +114,9 @@ func (p *PostR) PublishedYear() string {
 func (p *PostR) PublishedMonth() string {
 	return time.Unix(p.PublishedAt, 0).Format("01")
 }
+func (p *PostR) PublishedMonthSimple() string {
+	return time.Unix(p.PublishedAt, 0).Format("Jan")
+}
 
 func (p *PostR) PublishedDay() string {
 	return time.Unix(p.PublishedAt, 0).Format("02")
@@ -112,10 +127,14 @@ func (p *PostR) IsPublished() bool {
 }
 
 func (p *PostR) Cover() string {
-	if _, err := os.Stat(fmt.Sprintf("data/uploads/covers/%s.jpg", p.ID)); os.IsNotExist(err) {
-		return ""
+	ext := strings.Split("jpg,jpeg,png,JPG,JPEG,PNG", ",")
+	for _, e := range ext {
+		if _, err := os.Stat(fmt.Sprintf("data/uploads/covers/%s.%s", p.ID, e)); os.IsNotExist(err) {
+			continue
+		}
+		return fmt.Sprintf("/uploads/covers/%s.%s", p.ID, e)
 	}
-	return fmt.Sprintf("uploads/covers/%s.jpg", p.ID)
+	return ""
 }
 
 func (p *PostR) Excerpt() string {

@@ -5,8 +5,9 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/caris-events/tunalog/entity"
-	"github.com/caris-events/tunalog/system"
+	"golog/entity"
+	"golog/system"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,8 +17,11 @@ import (
 
 func SettingsView(c *gin.Context) {
 	c.HTML(http.StatusOK, "admin_settings", data(c, gin.H{
-		"Version":            system.Version,
+		"Version":            injection.Version,
 		"RuntimeVersion":     runtime.Version(),
+		"BuildTime":          injection.BuildTime,
+		"Commit":             injection.Commit,
+		"GitHub":             `<a href="https://github.com/WShihan/golog" target="_blank">https://github.com/WShihan/golog</a>`,
 		"Timezones":          entity.Timezones,
 		"Locales":            entity.Locales,
 		"IsCustomTimeFormat": system.Config.IsCustomTimeFormat(),
@@ -39,6 +43,7 @@ func SettingsView(c *gin.Context) {
 type SettingsEditRequest struct {
 	Name             string `form:"name" binding:"required,max=64" conform:"trim"`
 	Description      string `form:"description" binding:"required,max=128" conform:"trim"`
+	About            string `form:"about" binding:"required" conform:"trim"`
 	IsPublic         bool   `form:"is_public"`
 	Timezone         int    `form:"timezone" binding:"min=-43200,max=50400"`
 	DateFormat       string `form:"date_format" binding:"required"`
@@ -50,6 +55,7 @@ type SettingsEditRequest struct {
 
 func SettingsEdit(c *gin.Context, req *SettingsEditRequest) {
 	system.Config.Name = req.Name
+	system.Config.About = req.About
 	system.Config.Description = req.Description
 	system.Config.IsPublic = req.IsPublic
 	system.Config.Timezone = req.Timezone

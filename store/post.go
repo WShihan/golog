@@ -1,16 +1,18 @@
 package store
 
 import (
+	"fmt"
 	"time"
 
-	"github.com/caris-events/tunalog/entity"
-	"github.com/caris-events/tunalog/system"
+	"golog/entity"
+	"golog/system"
 )
 
 func createPostTable() error {
 	_, err := db.Exec(`
 	CREATE TABLE IF NOT EXISTS posts (
 		id             TEXT NOT NULL PRIMARY KEY,
+		type           TEXT NOT NULL,
 		title          TEXT NOT NULL,
 		slug           TEXT NOT NULL,
 		excerpt        TEXT NOT NULL,
@@ -54,7 +56,7 @@ func DeletePostsByUser(uid string) error {
 }
 
 func CreatePost(p *entity.PostW) error {
-	if _, err := db.Exec("INSERT INTO posts (id, title, slug, excerpt, author_id, password, visibility, content, published_at, created_at, updated_at, pinned_at, trashed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", p.ID, p.Title, p.Slug, p.Excerpt, p.AuthorID, p.Password, p.Visibility, p.Content, p.PublishedAt, p.CreatedAt, p.UpdatedAt, p.PinnedAt, p.TrashedAt); err != nil {
+	if _, err := db.Exec("INSERT INTO posts (id, type, title, slug, excerpt, author_id, password, visibility, content, published_at, created_at, updated_at, pinned_at, trashed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", p.ID, p.Type, p.Title, p.Slug, p.Excerpt, p.AuthorID, p.Password, p.Visibility, p.Content, p.PublishedAt, p.CreatedAt, p.UpdatedAt, p.PinnedAt, p.TrashedAt); err != nil {
 		return err
 	}
 	for _, tagID := range p.TagIDs {
@@ -164,6 +166,7 @@ func PtrBool(b bool) *bool {
 }
 
 type ListPostsQuery struct {
+	Type           string
 	AuthorID       string
 	TagID          string
 	Title          string
@@ -188,6 +191,10 @@ func (q *ListPostsQuery) Build() (query string, args []any) {
 	if q.TagID != "" {
 		query += " AND pt.tag_id = ?"
 		args = append(args, q.TagID)
+	}
+	if q.Type != "" {
+		query += " AND p.type = ?"
+		args = append(args, q.Type)
 	}
 	if q.AuthorID != "" {
 		query += " AND p.author_id = ?"
@@ -262,8 +269,8 @@ func CountPosts(q *ListPostsQuery) (int, error) {
 	return count, nil
 }
 
-func CountPostsByType() (*entity.PostCount, error) {
-	rows, err := db.Query("SELECT visibility, COUNT(*) FROM posts WHERE trashed_at = 0 GROUP BY visibility")
+func CountPostsByType(postType string) (*entity.PostCount, error) {
+	rows, err := db.Query("SELECT visibility, COUNT(*) FROM posts WHERE trashed_at = 0 AND type LIKE '%" + postType + "%' GROUP BY visibility")
 	if err != nil {
 		return nil, err
 	}
@@ -317,7 +324,7 @@ func ListPostDates() (data []string, err error) {
 
 func ListPosts(q *ListPostsQuery) ([]*entity.PostR, error) {
 	var args []any
-	query := "SELECT p.id, p.title, p.slug, p.excerpt, p.author_id, p.password, p.visibility, p.content, p.published_at, p.created_at, p.updated_at, p.pinned_at, p.trashed_at, u.id, u.nickname, u.email, u.bio, u.created_at FROM posts p JOIN users u ON p.author_id = u.id"
+	query := "SELECT p.id, p.type, p.title, p.slug, p.excerpt, p.author_id, p.password, p.visibility, p.content, p.published_at, p.created_at, p.updated_at, p.pinned_at, p.trashed_at, u.id, u.nickname, u.email, u.bio, u.created_at FROM posts p JOIN users u ON p.author_id = u.id"
 
 	qQuery, qArgs := q.Build()
 	query += qQuery
@@ -342,7 +349,7 @@ func ListPosts(q *ListPostsQuery) ([]*entity.PostR, error) {
 	for rows.Next() {
 		var p entity.PostR
 		p.Author = entity.UserR{}
-		if err := rows.Scan(&p.ID, &p.Title, &p.Slug, &p.OriginalExcerpt, &p.AuthorID, &p.Password, &p.Visibility, &p.Content, &p.PublishedAt, &p.CreatedAt, &p.UpdatedAt, &p.PinnedAt, &p.TrashedAt, &p.Author.ID, &p.Author.Nickname, &p.Author.Email, &p.Author.Bio, &p.Author.CreatedAt); err != nil {
+		if err := rows.Scan(&p.ID, &p.Type, &p.Title, &p.Slug, &p.OriginalExcerpt, &p.AuthorID, &p.Password, &p.Visibility, &p.Content, &p.PublishedAt, &p.CreatedAt, &p.UpdatedAt, &p.PinnedAt, &p.TrashedAt, &p.Author.ID, &p.Author.Nickname, &p.Author.Email, &p.Author.Bio, &p.Author.CreatedAt); err != nil {
 			return nil, err
 		}
 		tags, err := ListTagsByPost(p.ID)
@@ -355,10 +362,51 @@ func ListPosts(q *ListPostsQuery) ([]*entity.PostR, error) {
 	return posts, nil
 }
 
+func ListallPosts(q *ListPostsQuery) ([]*entity.PostR, error) {
+	var args []any
+	query := "SELECT p.id, p.Type, p.title, p.slug, p.excerpt, p.author_id, p.password, p.visibility, p.content, p.published_at, p.created_at, p.updated_at, p.pinned_at, p.trashed_at, u.id, u.nickname, u.email, u.bio, u.created_at FROM posts p JOIN users u ON p.author_id = u.id"
+
+	qQuery, qArgs := q.Build()
+	query += qQuery
+	args = append(args, qArgs...)
+	query += " ORDER BY p.pinned_at DESC, p.published_at DESC, p.created_at DESC"
+
+	if q.Limit > 0 && q.Offset >= 0 {
+		query += " LIMIT ? OFFSET ?"
+		args = append(args, q.Limit, q.Offset)
+	} else if q.Limit > 0 {
+		query += " LIMIT ?"
+		args = append(args, q.Limit)
+	}
+
+	rows, err := db.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []*entity.PostR
+	for rows.Next() {
+		var p entity.PostR
+		p.Author = entity.UserR{}
+		if err := rows.Scan(&p.ID, &p.Type, &p.Title, &p.Slug, &p.OriginalExcerpt, &p.AuthorID, &p.Password, &p.Visibility, &p.Content, &p.PublishedAt, &p.CreatedAt, &p.UpdatedAt, &p.PinnedAt, &p.TrashedAt, &p.Author.ID, &p.Author.Nickname, &p.Author.Email, &p.Author.Bio, &p.Author.CreatedAt); err != nil {
+			return nil, err
+		}
+		tags, err := ListTagsByPost(p.ID)
+		if err != nil {
+			return nil, err
+		}
+		p.Tags = tags
+		posts = append(posts, &p)
+	}
+
+	return posts, nil
+}
+
 func GetPost(id string) (*entity.PostR, error) {
 	var p entity.PostR
 	p.Author = entity.UserR{}
-	if err := db.QueryRow("SELECT p.id, p.title, p.slug, p.excerpt, p.author_id, p.password, p.visibility, p.content, p.published_at, p.created_at, p.updated_at, p.pinned_at, p.trashed_at, u.id, u.nickname, u.email, u.bio, u.created_at FROM posts p JOIN users u ON p.author_id = u.id WHERE p.id = ? AND p.trashed_at = 0", id).Scan(&p.ID, &p.Title, &p.Slug, &p.OriginalExcerpt, &p.AuthorID, &p.Password, &p.Visibility, &p.Content, &p.PublishedAt, &p.CreatedAt, &p.UpdatedAt, &p.PinnedAt, &p.TrashedAt, &p.Author.ID, &p.Author.Nickname, &p.Author.Email, &p.Author.Bio, &p.Author.CreatedAt); err != nil {
+	if err := db.QueryRow("SELECT p.id, p.type, p.title, p.slug, p.excerpt, p.author_id, p.password, p.visibility, p.content, p.published_at, p.created_at, p.updated_at, p.pinned_at, p.trashed_at, u.id, u.nickname, u.email, u.bio, u.created_at FROM posts p JOIN users u ON p.author_id = u.id WHERE p.id = ? AND p.trashed_at = 0", id).Scan(&p.ID, &p.Type, &p.Title, &p.Slug, &p.OriginalExcerpt, &p.AuthorID, &p.Password, &p.Visibility, &p.Content, &p.PublishedAt, &p.CreatedAt, &p.UpdatedAt, &p.PinnedAt, &p.TrashedAt, &p.Author.ID, &p.Author.Nickname, &p.Author.Email, &p.Author.Bio, &p.Author.CreatedAt); err != nil {
 		return nil, err
 	}
 	tags, err := ListTagsByPost(p.ID)
@@ -370,7 +418,7 @@ func GetPost(id string) (*entity.PostR, error) {
 }
 
 func UpdatePost(p *entity.PostW) error {
-	if _, err := db.Exec("UPDATE posts SET title = ?, slug = ?, excerpt = ?, author_id = ?, password = ?, visibility = ?, content = ?, published_at = ?, created_at = ?, updated_at = ?, pinned_at = ? WHERE id = ?", p.Title, p.Slug, p.Excerpt, p.AuthorID, p.Password, p.Visibility, p.Content, p.PublishedAt, p.CreatedAt, p.UpdatedAt, p.PinnedAt, p.ID); err != nil {
+	if _, err := db.Exec("UPDATE posts SET type = ?, title = ?, slug = ?, excerpt = ?, author_id = ?, password = ?, visibility = ?, content = ?, published_at = ?, created_at = ?, updated_at = ?, pinned_at = ? WHERE id = ?", p.Type, p.Title, p.Slug, p.Excerpt, p.AuthorID, p.Password, p.Visibility, p.Content, p.PublishedAt, p.CreatedAt, p.UpdatedAt, p.PinnedAt, p.ID); err != nil {
 		return err
 	}
 	if _, err := db.Exec("DELETE FROM post_tags WHERE post_id = ?", p.ID); err != nil {
@@ -396,4 +444,150 @@ func GetPostBySlug(slug string) (*entity.PostR, error) {
 	}
 	p.Tags = tags
 	return &p, nil
+}
+
+func GetPostByID(id string) (*entity.PostR, error) {
+	var p entity.PostR
+	p.Author = entity.UserR{}
+	if err := db.QueryRow("SELECT p.id, p.title, p.slug, p.excerpt, p.author_id, p.password, p.visibility, p.content, p.published_at, p.created_at, p.updated_at, p.pinned_at, p.trashed_at, u.id, u.nickname, u.email, u.bio, u.created_at FROM posts p JOIN users u ON p.author_id = u.id WHERE p.id = ? ", id).Scan(&p.ID, &p.Title, &p.Slug, &p.OriginalExcerpt, &p.AuthorID, &p.Password, &p.Visibility, &p.Content, &p.PublishedAt, &p.CreatedAt, &p.UpdatedAt, &p.PinnedAt, &p.TrashedAt, &p.Author.ID, &p.Author.Nickname, &p.Author.Email, &p.Author.Bio, &p.Author.CreatedAt); err != nil {
+		return nil, err
+	}
+	tags, err := ListTagsByPost(p.ID)
+	if err != nil {
+		return nil, err
+	}
+	p.Tags = tags
+	return &p, nil
+}
+
+func GroupPostByMonth(blogType string) (*map[[2]string]int, error) {
+	query := fmt.Sprintf(`
+        SELECT 
+            id, title, created_at, published_at
+        FROM posts WHERE trashed_at = 0 AND type = '%s'
+    `, blogType)
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("查询失败: %v", err)
+	}
+	defer rows.Close()
+
+	var posts []entity.PostR
+	for rows.Next() {
+		var p entity.PostR
+		err := rows.Scan(
+			&p.ID,
+			&p.Title,
+			&p.CreatedAt,
+			&p.PublishedAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("查询失败: %v", err)
+		}
+		posts = append(posts, p)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("遍历结果集失败: %v", err)
+	}
+
+	stat := make(map[[2]string]int)
+	for _, p := range posts {
+		year := p.PublishedYear()
+		month := p.PublishedMonth()
+
+		key := [2]string{year, month}
+		stat[key]++
+
+	}
+
+	return &stat, nil
+}
+
+func GroupPostByYear(blogType string) (*map[string]int, error) {
+	query := fmt.Sprintf(`
+        SELECT 
+            id, title, created_at, published_at
+        FROM posts WHERE trashed_at = 0 AND type = '%s'
+    `, blogType)
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("查询失败: %v", err)
+	}
+	defer rows.Close()
+
+	var posts []entity.PostR
+	for rows.Next() {
+		var p entity.PostR
+		err := rows.Scan(
+			&p.ID,
+			&p.Title,
+			&p.CreatedAt,
+			&p.PublishedAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("查询失败: %v", err)
+		}
+		posts = append(posts, p)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("遍历结果集失败: %v", err)
+	}
+
+	stat := make(map[string]int)
+	for _, p := range posts {
+		year := p.PublishedYear()
+		stat[year]++
+
+	}
+
+	return &stat, nil
+}
+
+func GroupPostByTag() (*map[[2]string]int, error) {
+	query := `
+        SELECT 
+            id, title, created_at, published_at
+        FROM posts WHERE trashed_at = 0
+    `
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("查询失败: %v", err)
+	}
+	defer rows.Close()
+
+	var posts []entity.PostR
+	for rows.Next() {
+		var p entity.PostR
+		err := rows.Scan(
+			&p.ID,
+			&p.Title,
+			&p.CreatedAt,
+			&p.PublishedAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("查询失败: %v", err)
+		}
+		posts = append(posts, p)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("遍历结果集失败: %v", err)
+	}
+
+	stat := make(map[[2]string]int)
+	for _, p := range posts {
+		tags, err := ListTagsByPost(p.ID)
+		if err != nil {
+			return nil, err
+		}
+		if len(tags) == 0 {
+			continue
+		}
+		key := [2]string{tags[0].Name, tags[0].Slug}
+		stat[key]++
+	}
+
+	return &stat, nil
 }

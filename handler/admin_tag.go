@@ -5,8 +5,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/caris-events/tunalog/entity"
-	"github.com/caris-events/tunalog/store"
+	"golog/entity"
+	"golog/store"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )

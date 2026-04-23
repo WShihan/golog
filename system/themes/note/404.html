@@ -1,0 +1,17 @@
+{{ define "og" }}{{ end }}
+
+{{ define "content" }}
+    <div class="ts-blankslate is-narrow">
+        <span class="ts-icon is-ghost-icon"></span>
+        <div class="header">{{ __ "404_title" }}</div>
+        <div class="description">{{ __ "404_description" }}</div>
+        <div class="action">
+            <a href="{{ .URL.AbsoluteHost }}" class="ts-button">{{ __ "button_returnhomepage" }}</a>
+        </div>
+    </div>
+{{ end }}
+
+{{ define "head" }}
+  <link rel="stylesheet" href="/assets/blogs.css" />
+  <title>页面丢失·404</title>
+{{ end }}

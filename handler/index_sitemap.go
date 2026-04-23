@@ -6,8 +6,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/caris-events/tunalog/entity"
-	"github.com/caris-events/tunalog/store"
+	"golog/entity"
+	"golog/store"
+	"golog/util"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,6 +19,7 @@ import (
 
 func SiteMapView(c *gin.Context) {
 	q := &store.ListPostsQuery{
+		Type:         util.BlogType,
 		IsPublished:  store.PtrBool(true),
 		IsTrashed:    store.PtrBool(false),
 		Visibilities: []entity.Visibility{entity.VisibilityPublic},
@@ -50,9 +53,17 @@ func SiteMapView(c *gin.Context) {
 
 func sitemapURL(c *gin.Context, post *entity.PostR) string {
 	suffix := "https://"
+	// if c.Request.TLS == nil {
+	// 	suffix = "http://"
+	// }
+	root := suffix + c.Request.Host
+	return fmt.Sprintf("%s/post/%s", root, post.Slug)
+}
+func sitemapGUID(c *gin.Context, post *entity.PostR) string {
+	suffix := "https://"
 	if c.Request.TLS == nil {
 		suffix = "http://"
 	}
 	root := suffix + c.Request.Host
-	return fmt.Sprintf("%s/post/%s", root, post.Slug)
+	return fmt.Sprintf("%s/blog/%s", root, post.ID)
 }

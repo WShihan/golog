@@ -80,6 +80,7 @@
                     <thead>
                         <tr>
                             <th>{{ __ "posts_title" }}</th>
+                            <th class="is-collapsed">类型</th>
                             <th class="is-collapsed">{{ __ "posts_author" }}</th>
                             <th class="is-collapsed">{{ __ "posts_date" }}</th>
                         </tr>
@@ -103,9 +104,9 @@
                                         <span class="item-pinned ts-icon is-star-icon" data-tooltip="{{ __ "posts_helper_pinned" }}"></span>
                                         {{ end }}
                                         {{ if $v.TrashedAt }}
-                                        <span class="ts-text is-bold">{{ $v.Title }}</span>
+                                        <span class="ts-text is-bold">{{ $v.Title }}</span></span>
                                         {{ else }}
-                                        <a href="{{ $.URL.RelativeRoot }}admin/post/{{ $v.ID }}" class="ts-text is-link is-bold is-undecorated">{{ $v.Title }}</a>
+                                        <a href="{{ $.URL.RelativeRoot }}admin/post/{{ $v.ID }}" class="ts-text is-link is-bold is-undecorated">{{ $v.Title }} </a>
                                         {{ end }}
                                         {{ if and (eq $v.Visibility "password") (ne $.Visibility "password") }}
                                         <span class="ts-text is-secondary">{{ __ "posts_helper_password" }}</span>
@@ -152,6 +153,9 @@
                                 </div>
                             </td>
                             <td class="is-collapsed">
+                                {{ ptn $v.Type }}
+                            </td>
+                            <td class="is-collapsed">
                                 {{ $v.Author.Nickname }}
                             </td>
                             <td class="is-collapsed has-leading-none">
@@ -183,6 +187,23 @@
         <form method="get">
             <div class="ts-content">
                 <div class="ts-header is-large">{{ __ "sidebar_filter" }}</div>
+                <div class="ts-text is-label has-top-spaced-large">{{ __ "posts_type" }}</div>
+                <div class="ts-select is-fluid has-top-spaced">
+                    <select name="type" x-model="type">
+                        {{ if eq .Query.Type "" }}
+                            <option value="" selected>{{ __ "option_any" }}</option>
+                        {{ else }}
+                            <option value="">{{ __ "option_any" }}</option>
+                        {{ end }}
+                        {{ range $key, $value := .BlogTypes }}
+                            {{ if eq $value $.Query.Type }}
+                            <option value="{{ $value }}" selected>{{ $key }}</option>
+                            {{ else }}
+                            <option value="{{ $value }}">{{ $key }}</option>
+                            {{ end }}
+                        {{ end }}
+                    </select>
+                </div>
                 <div class="ts-text is-label has-top-spaced-large">{{ __ "posts_title" }}</div>
                 <div class="ts-input is-fluid has-top-spaced">
                     <input type="text" name="title" value="{{ .Query.Title }}" />

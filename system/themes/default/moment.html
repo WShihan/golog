@@ -1,0 +1,50 @@
+{{ define "og" }}{{ end }}
+
+{{ define "head" }}
+<link rel="stylesheet" href="/assets/moment.css">
+<title>时刻</title>
+{{ end }}
+
+{{ define "content" }}
+<div class="covers">
+  {{ range .Posts}}
+    <div class="cover">
+        <div class="lazy-img-wrapper">
+            <a target="_blank" href="{{ .Cover }}"><img class="lazy-img"  data-src="{{ .Cover }}" alt=""></a>
+        </div>
+        <div class="info">
+          <div class="item saying">
+            <span class="content-text">{{ .Content }}</span>
+          </div>
+          <div class="item now">
+            <div class="day">
+              <span>{{.PublishedDay}}</span>
+            </div>
+            <div class="date">
+              <span class="content-text">{{.PublishedMonthSimple }} {{.PublishedYear}} </span>
+            </div>
+          </div>
+        </div>
+      </div>
+  {{ end }}
+
+</div>
+{{ if gt .Pagination.TotalPages 1 }}
+<div class="pagination is-secondary" >
+    {{ if gt .Pagination.CurrentPage 1 }}
+    <a href="?{{ .Pagination.Query }}page={{ sub .Pagination.CurrentPage 1 }}" class="item">{{ __ "pagination_new" }}</a>
+    {{ else }}
+    <span class="item is-disabled">{{ __ "pagination_new" }}</span>
+    {{ end }}
+
+    <span class="item is-active">{{ _f "pagination_info" .Pagination.CurrentPage .Pagination.TotalPages }}</span>
+
+    {{ if lt .Pagination.CurrentPage .Pagination.TotalPages }}
+    <a href="?{{ .Pagination.Query }}page={{ add .Pagination.CurrentPage 1 }}" class="item">{{ __ "pagination_old" }}</a>
+    {{ else }}
+    <span class="item is-disabled">{{ __ "pagination_old" }}</span>
+    {{ end }}
+</div>
+{{ end }}
+
+{{ end }}

@@ -1,5 +1,5 @@
 {{ define "pagination" }}
-<div class="ts-pagination is-secondary">
+<div class="pagination is-secondary">
     <a class="item is-back {{if eq .Pagination.CurrentPage 1 }}is-disabled{{ end }}" href="?{{ .Pagination.Query }}page={{ sub .Pagination.CurrentPage 1 }}"></a>
 
     {{ if gt .Pagination.CurrentPage 3 }}

@@ -3,23 +3,17 @@
     <head>
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocas/5.0.1/tocas.min.css" />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/tocas/5.0.1/tocas.min.js"></script>
+        <link rel="stylesheet" href="/admin/assets/admin.css" />
+        <script src="/admin/assets/admin.js"></script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&family=Noto+Sans+KR:wght@100..900&family=Noto+Sans+SC:wght@100..900&family=Noto+Sans+TC:wght@100..900&display=swap" rel="stylesheet">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <link rel="icon" type="image/png" href="{{ .URL.RelativeRoot }}assets/favicon.png">
+        {{ if and .Config .Config.Favicon }}<link rel="icon" href="{{ .Config.Favicon }}" type="image/x-icon" />{{ else }}<link rel="icon" type="image/png" href="{{ .URL.RelativeRoot }}assets/favicon.ico">{{ end }}
         <title>{{ .Name }}</title>
         <style>
             body {
                 font-family: "Noto Sans TC", "Noto Sans SC", "Noto Sans JP", "Noto Sans KR";
-            }
-            /** temporary fix for #14, on hold for Tocas 5.0.2 */
-            @-moz-document url-prefix() {
-                body:has(> .ts-app-center, > form > .ts-app-center) {
-                    height: 100%;
-                }
             }
         </style>
     </head>
@@ -29,10 +23,11 @@
             <div class="ts-app-center">
                 <div class="content">
                     <div class="ts-header is-large is-heavy is-icon">
-                        <div class="ts-icon is-fish-icon"></div>
-                        <a class="ts-text is-undecorated" href="{{ .URL.RelativeRoot }}">{{ .Name }}</a>
+                        <a href="/" target="_blank" title="{{ .Config.Name }}">
+                        <img src="/assets/favicon.ico" style="width: 2em;" alt="Golog">
+                        </a>
                     </div>
-                    <div class="has-top-spaced-large" style="width: 280px">
+                    <div class="has-top-spaced-large" style="width: 100%">
                         {{ if .Message }}
                         <div class="ts-notice is-negative has-bottom-spaced">
                             <div class="content">{{ .Message }}</div>

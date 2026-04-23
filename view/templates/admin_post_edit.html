@@ -52,6 +52,26 @@
                     </div>
                     <div class="ts-divider"></div>
                     <div class="ts-content">
+                        {{ if .BlogTypes }}
+                        <!-- type -->
+                        <div class="ts-text is-label">
+                            <span class="ts-icon is-link-icon is-end-spaced"></span>
+                            {{ __ "postcreate_type" }}
+                        </div>
+                        <div class="ts-select is-fluid has-top-spaced">
+                            <select name="type" x-model="type">
+                                {{ range $key, $value := .BlogTypes }}
+                                   {{ if eq $value $.Post.Type }}
+                                   <option value="{{ $value }}" selected>{{ $key }}</option>
+                                   {{ else }}
+                                   <option value="{{ $value }}">{{ $key }}</option>
+                                   {{ end }}
+                                {{ end }}
+                            </select>
+                        </div>
+                        <!-- / type -->
+                        {{ end }}
+
                         <!-- visibility -->
                         <div class="ts-text is-label">
                             <span class="ts-icon is-eye-icon is-end-spaced"></span>

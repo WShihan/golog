@@ -9,16 +9,23 @@ import (
 	"log"
 	"os"
 	"slices"
+	"sync"
 	"time"
 
-	"github.com/caris-events/tunalog/entity"
+	"golog/entity"
+	"golog/util"
+
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/html"
 	"github.com/gomarkdown/markdown/parser"
 	"github.com/teacat/i18n"
 )
 
-const Version = "1.0.2"
+const (
+	dirPerm           = 0755         // 目录权限
+	configFilePerm    = 0644         // 配置文件权限
+	defaultDateFormat = "2006-01-02" // 默认日期格式
+)
 
 var (
 	Config *entity.Config
@@ -31,12 +38,17 @@ var (
 
 	IndexTmpl    *template.Template
 	SingularTmpl *template.Template
+	MomentTmpl   *template.Template
+	WhisperTmpl  *template.Template
+	AboutTmpl    *template.Template
 	NotFoundTmpl *template.Template
 
 	//go:embed locales
 	LocalesFS embed.FS
-	//go:embed themes/default
+	//go:embed themes
 	ThemesFS embed.FS
+
+	markdownCache sync.Map // Markdown渲染缓存
 
 	funcs = template.FuncMap{
 		"add": func(x, y int) int {
@@ -49,15 +61,28 @@ var (
 			return template.HTML(v)
 		},
 		"unix2date": func(v int64) string {
+			if Config == nil {
+				return time.Unix(v, 0).Format(defaultDateFormat)
+			}
 			return time.Unix(v, 0).Format(Config.DateFormat)
 		},
 		"markdown": func(v string) template.HTML {
-			p := parser.NewWithExtensions(parser.CommonExtensions | parser.AutoHeadingIDs | parser.NoEmptyLineBeforeBlock | parser.Footnotes | parser.SuperSubscript | parser.MathJax)
+			// 检查缓存
+			if cached, ok := markdownCache.Load(v); ok {
+				return cached.(template.HTML)
+			}
+
+			// 渲染Markdown
+			p := parser.NewWithExtensions(parser.CommonExtensions | parser.MathJax | parser.LaxHTMLBlocks | parser.AutoHeadingIDs | parser.NoEmptyLineBeforeBlock | parser.Footnotes | parser.SuperSubscript)
 			doc := p.Parse([]byte(v))
 			renderer := html.NewRenderer(html.RendererOptions{
 				Flags: html.HrefTargetBlank,
 			})
-			return template.HTML(markdown.Render(doc, renderer))
+			result := template.HTML(markdown.Render(doc, renderer))
+
+			// 存入缓存
+			markdownCache.Store(v, result)
+			return result
 		},
 		"__": func(v string) template.HTML {
 			return template.HTML(themeLocale.String(v))
@@ -65,29 +90,29 @@ var (
 		"_f": func(v string, data ...any) string {
 			return fmt.Sprintf(themeLocale.String(v), data...)
 		},
+		"md2html": util.MD2HTML,
+		"ptn": func(v string) string {
+			switch v {
+			case util.BlogType:
+				return util.BlogKey
+			case util.MomentType:
+				return util.MomentKey
+			case util.WhisperType:
+				return util.WhisperKey
+			default:
+				return v
+			}
+		},
 	}
 )
 
 func init() {
-	if err := os.MkdirAll("data/uploads/images", 0755); err != nil {
+	if err := os.MkdirAll("data/uploads/images", dirPerm); err != nil {
 		log.Fatalln(err)
 	}
-	if err := os.MkdirAll("data/uploads/covers", 0755); err != nil {
+	if err := os.MkdirAll("data/uploads/covers", dirPerm); err != nil {
 		log.Fatalln(err)
 	}
-	if err := os.MkdirAll("data/themes", 0755); err != nil {
-		log.Fatalln(err)
-	}
-	if _, err := os.Stat("data/themes/default"); os.IsNotExist(err) {
-		f, err := fs.Sub(ThemesFS, "themes")
-		if err != nil {
-			log.Fatalln(err)
-		}
-		if err := os.CopyFS("data/themes", f); err != nil {
-			log.Fatalln(err)
-		}
-	}
-
 	// init locale
 	localeBase = i18n.New("en_US")
 	localeBase.LoadFS(LocalesFS, "locales/*.json")
@@ -115,40 +140,78 @@ func SaveConfig() error {
 	if err != nil {
 		return err
 	}
-	if err := os.WriteFile("config.json", b, 0644); err != nil {
+	if err := os.WriteFile("config.json", b, configFilePerm); err != nil {
 		return err
 	}
 
-	IndexTmpl, err = template.
-		New("index.html").
-		Funcs(funcs).ParseGlob(fmt.Sprintf("data/themes/%s/*.html", Config.Theme))
+	tmpl, err := template.New("template.html").Funcs(funcs).ParseFS(ThemesFS, fmt.Sprintf("themes/%s/template.html", Config.Theme))
 	if err != nil {
 		return err
 	}
-	SingularTmpl, err = template.
-		New("singular.html").
-		Funcs(funcs).ParseGlob(fmt.Sprintf("data/themes/%s/*.html", Config.Theme))
-	if err != nil {
+
+	// 加载所有模板
+	if err := loadAllTemplates(tmpl); err != nil {
 		return err
 	}
-	// load 404.html optionally
-	NotFoundTmpl = nil
-	if _, err := os.Stat(fmt.Sprintf("data/themes/%s/404.html", Config.Theme)); !os.IsNotExist(err) {
-		NotFoundTmpl, err = template.
-			New("404.html").
-			Funcs(funcs).ParseGlob(fmt.Sprintf("data/themes/%s/*.html", Config.Theme))
-		if err != nil {
-			return err
-		}
-	}
+
 	// load theme locales, or skip if not exists
 	themeLocaleBase = i18n.New("default")
-	if _, err := os.Stat(fmt.Sprintf("data/themes/%s/locales", Config.Theme)); !os.IsNotExist(err) {
-		themeLocaleBase.LoadGlob(fmt.Sprintf("data/themes/%s/locales/*.json", Config.Theme))
+	if _, err := fs.Stat(ThemesFS, fmt.Sprintf("themes/%s/locales", Config.Theme)); err == nil {
+		themeLocaleBase.LoadFS(ThemesFS, fmt.Sprintf("themes/%s/locales/*.json", Config.Theme))
 		themeLocale = themeLocaleBase.NewLocale(Config.Locale)
 	}
 
 	ReloadLocale(Config.Locale)
+
+	markdownCache = sync.Map{}
+
+	return nil
+}
+
+// loadTemplateFS 从 embed.FS 加载单个模板文件
+func loadTemplateFS(tmpl *template.Template, path string) (*template.Template, error) {
+	parent, err := tmpl.Clone()
+	if err != nil {
+		return nil, err
+	}
+	return parent.ParseFS(ThemesFS, path)
+}
+
+// loadAllTemplates 加载所有模板
+func loadAllTemplates(tmpl *template.Template) error {
+	var err error
+	themePath := fmt.Sprintf("themes/%s", Config.Theme)
+
+	IndexTmpl, err = loadTemplateFS(tmpl, fmt.Sprintf("%s/index.html", themePath))
+	if err != nil {
+		return err
+	}
+
+	SingularTmpl, err = loadTemplateFS(tmpl, fmt.Sprintf("%s/singular.html", themePath))
+	if err != nil {
+		return err
+	}
+
+	MomentTmpl, err = loadTemplateFS(tmpl, fmt.Sprintf("%s/moment.html", themePath))
+	if err != nil {
+		return err
+	}
+
+	WhisperTmpl, err = loadTemplateFS(tmpl, fmt.Sprintf("%s/whisper.html", themePath))
+	if err != nil {
+		return err
+	}
+
+	AboutTmpl, err = loadTemplateFS(tmpl, fmt.Sprintf("%s/about.html", themePath))
+	if err != nil {
+		return err
+	}
+
+	NotFoundTmpl, err = loadTemplateFS(tmpl, fmt.Sprintf("%s/404.html", themePath))
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -165,15 +228,16 @@ func ReloadLocale(v ...string) {
 // ===============================
 
 func Themes() (themes []string) {
-	files, err := os.ReadDir("data/themes")
+	entries, err := fs.ReadDir(ThemesFS, "themes")
 	if err != nil {
 		return
 	}
-	for _, file := range files {
-		if file.IsDir() {
-			themes = append(themes, file.Name())
+	for _, entry := range entries {
+		if entry.IsDir() {
+			themes = append(themes, entry.Name())
 		}
 	}
+	slices.Sort(themes)
 	return
 }
 

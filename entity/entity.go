@@ -68,10 +68,9 @@ var Timezones = map[string]int{
 }
 
 var Locales = map[string]string{
-	"台灣正體":     "zh-tw",
-	"English":  "en-us",
-	"简体中文":     "zh-cn",
-	"Français": "fr-fr",
+	"台灣正體":    "zh-tw",
+	"English": "en-us",
+	"简体中文":    "zh-cn",
 }
 
 var PageTypes = map[string]string{
@@ -102,6 +101,7 @@ var RelativeRoots = map[string]string{
 	"/author/:author":             "../../",
 	"/archive/:year":              "../../",
 	"/post/:slug":                 "../../",
+	"/moment/:year":               "../../",
 	"/admin/user/:id":             "../../../",
 	"/navigations/edit":           "../../../",
 	"/admin/tag/:id":              "../../../",

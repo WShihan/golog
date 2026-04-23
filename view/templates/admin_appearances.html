@@ -63,8 +63,8 @@
                 <!-- / container_width -->
 
                 <!-- font_family -->
-                <div class="ts-control has-top-spaced-large">
-                    <div class="label">{{ __ "appearances_fontfamily" }}</div>
+                <div class="ts-control has-top-spaced-large" style="display: none;">
+                    <div class="label" >{{ __ "appearances_fontfamily" }}</div>
                     <div class="content is-padded">
                         <div class="ts-wrap is-vertical is-compact">
                             <label class="ts-radio">
@@ -84,7 +84,7 @@
                 <!-- / font_family -->
 
                 <!-- font_size -->
-                <div class="ts-control has-top-spaced-large">
+                <div class="ts-control has-top-spaced-large" style="display: none;">
                     <div class="label">{{ __ "appearances_fontsize" }}</div>
                     <div class="content is-padded">
                         <div class="ts-wrap is-vertical is-compact">
@@ -130,8 +130,8 @@
                 <!-- / highlight_js -->
 
                 <!-- author_block -->
-                <div class="ts-control has-top-spaced-large">
-                    <div class="label">{{ __ "appearances_authorblock" }}</div>
+                <div class="ts-control has-top-spaced-large" style="display: none;">
+                    <div class="label" >{{ __ "appearances_authorblock" }}</div>
                     <div class="content is-padded">
                         <div class="ts-wrap is-vertical is-compact">
                             <label class="ts-radio">
@@ -199,6 +199,20 @@
                     </div>
                 </div>
                 <!-- / themes -->
+
+                <!-- favicon -->
+                <div class="ts-control has-top-spaced-large">
+                    <div class="label">{{ __ "appearances_favicon" }}</div>
+                    <div class="content">
+                        <div class="ts-input">
+                            <input name="favicon" type="text" value="{{ .Config.Favicon }}" placeholder="https://example.com/favicon.ico" />
+                        </div>
+                        <div class="ts-text is-description has-top-spaced-small">
+                            {{ __ "appearances_favicon_description" }}
+                        </div>
+                    </div>
+                </div>
+                <!-- / favicon -->
             </div>
             <div class="ts-divider"></div>
             <div class="ts-content is-dense is-secondary">

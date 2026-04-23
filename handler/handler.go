@@ -9,10 +9,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/YamiOdymel/conform"
+	"golog/system"
+	"golog/util"
+	"golog/view"
+
 	"github.com/YamiOdymel/multitemplate"
-	"github.com/caris-events/tunalog/system"
-	"github.com/caris-events/tunalog/view"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -20,6 +21,7 @@ import (
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/html"
 	"github.com/gomarkdown/markdown/parser"
+	"github.com/leebenson/conform"
 	"github.com/thanhpk/randstr"
 	csrf "github.com/utrack/gin-csrf"
 )
@@ -65,7 +67,7 @@ var (
 			return time.Unix(time.Now().Unix()+int64(v), 0).UTC().Format("2006-01-02 03:04 PM")
 		},
 		"markdown": func(v string) template.HTML {
-			p := parser.NewWithExtensions(parser.CommonExtensions | parser.AutoHeadingIDs | parser.NoEmptyLineBeforeBlock | parser.Footnotes | parser.SuperSubscript | parser.MathJax)
+			p := parser.NewWithExtensions(parser.CommonExtensions | parser.MathJax | parser.LaxHTMLBlocks | parser.AutoHeadingIDs | parser.NoEmptyLineBeforeBlock | parser.Footnotes | parser.SuperSubscript | parser.LaxHTMLBlocks | parser.MathJax | parser.HardLineBreak | parser.Autolink | parser.Strikethrough)
 			doc := p.Parse([]byte(v))
 
 			renderer := html.NewRenderer(html.RendererOptions{
@@ -74,11 +76,24 @@ var (
 
 			return template.HTML(markdown.Render(doc, renderer))
 		},
+		"md2html": util.MD2HTML,
 		"__": func(v string) template.HTML {
 			return template.HTML(system.Locale.String(v))
 		},
 		"_f": func(v string, data ...any) string {
 			return fmt.Sprintf(system.Locale.String(v), data...)
+		},
+		"ptn": func(v string) string {
+			switch v {
+			case util.BlogType:
+				return util.BlogKey
+			case util.MomentType:
+				return util.MomentKey
+			case util.WhisperType:
+				return util.WhisperKey
+			default:
+				return v
+			}
 		},
 	}
 )
@@ -89,7 +104,7 @@ func init() {
 	Router = gin.Default()
 
 	Router.Use(
-		sessions.Sessions("tunalog", cookie.NewStore([]byte(randstr.String(64, randstr.Base62Chars)))),
+		sessions.Sessions("golog", cookie.NewStore([]byte(randstr.String(64, randstr.Base62Chars)))),
 		csrf.Middleware(csrf.Options{
 			Secret: randstr.String(64, randstr.Base62Chars),
 			ErrorFunc: func(c *gin.Context) {
@@ -124,12 +139,14 @@ func init() {
 	Router.GET("/login", checkConfig, LoginView)
 	Router.POST("/login", checkConfig, throttle, handleForm(Login))
 
+	// admin assets (publicly accessible so login/wizard pages can load them)
+	Router.StaticFS("/admin/assets", http.FS(fs))
+
 	// admin
 	adminRoute := Router.Group("/admin", checkConfig, checkLoggedIn)
 	{
 		adminRoute.GET("/", func(c *gin.Context) { c.Redirect(http.StatusFound, "posts") })
 
-		adminRoute.StaticFS("/assets", http.FS(fs))
 		adminRoute.Static("/uploads", "data/uploads")
 		adminRoute.Static("/post/uploads", "data/uploads")
 
@@ -181,8 +198,10 @@ func init() {
 	{
 		publicRoute.Static("/uploads", "data/uploads")
 		publicRoute.GET("/", IndexView)
-		//publicRoute.GET("/sitemap.xml", SiteMapView)
+		publicRoute.GET("/about", AboutView)
+		publicRoute.GET("/sitemap.xml", SiteMapView)
 		publicRoute.GET("/rss.xml", RSSView)
+		publicRoute.GET("/feed.xml", RSSView)
 		publicRoute.GET("/assets/:asset", AssetView)
 
 		publicRoute.GET("/tag/:tag", IndexView)
@@ -192,6 +211,11 @@ func init() {
 		publicRoute.GET("/archive/:year/:month/:day", IndexView)
 
 		publicRoute.GET("/post/:slug", SingularView)
+		publicRoute.GET("/post/auto/create", PostCreateViewAuto)
+		publicRoute.GET("/blog/:id", SingularViewByID)
+		publicRoute.GET("/moment", MomentView)
+		publicRoute.GET("/moment/:year", MomentView)
+		publicRoute.GET("/whisper", WhisperView)
 		publicRoute.POST("/post/:slug", throttle, SingularView)
 	}
 }
@@ -201,18 +225,22 @@ func handleForm[T any](fn func(*gin.Context, T)) gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 		var req T
-		if err := c.Bind(&req); err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
+
+		if err := c.ShouldBind(&req); err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		if err := conform.Strings(req); err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
+
+		if err := conform.Strings(&req); err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
+
 		if err := valid.Struct(req); err != nil {
-			c.AbortWithError(http.StatusBadRequest, err)
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
+
 		fn(c, req)
 	}
 }

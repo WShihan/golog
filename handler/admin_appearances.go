@@ -3,8 +3,9 @@ package handler
 import (
 	"net/http"
 
-	"github.com/caris-events/tunalog/entity"
-	"github.com/caris-events/tunalog/system"
+	"golog/entity"
+	"golog/system"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -32,6 +33,7 @@ type AppearancesEditRequest struct {
 	AuthorBlock    entity.AuthorBlock `form:"author_block" binding:"oneof=none start end"`
 	PostsPerPage   int                `form:"posts_per_page" binding:"min=1,max=999"`
 	Theme          string             `form:"theme" binding:"required"`
+	Favicon        string             `form:"favicon" conform:"trim"`
 }
 
 func AppearancesEdit(c *gin.Context, req *AppearancesEditRequest) {
@@ -48,6 +50,7 @@ func AppearancesEdit(c *gin.Context, req *AppearancesEditRequest) {
 	system.Config.AuthorBlock = req.AuthorBlock
 	system.Config.PostsPerPage = req.PostsPerPage
 	system.Config.Theme = req.Theme
+	system.Config.Favicon = req.Favicon
 
 	if err := system.SaveConfig(); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)

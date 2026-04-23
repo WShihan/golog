@@ -5,7 +5,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/caris-events/tunalog/entity"
+	"golog/entity"
+
 	"github.com/gin-gonic/gin"
 )
 
