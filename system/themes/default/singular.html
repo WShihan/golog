@@ -21,7 +21,7 @@
             {{ if .Post.Tags }}
             <span class="category h-center">#{{ (index .Post.Tags 0).Name }}#</span>
             {{ else }}
-            <span class="category h-center">未分类</span>
+            <span class="category h-center"></span>
             {{ end }}
         </div>
      {{ else }}

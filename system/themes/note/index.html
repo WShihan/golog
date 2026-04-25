@@ -34,14 +34,14 @@
                                     {{ .PublishedAt | unix2date -}}
                                 </a>
                               </a></span>
-                              <span class="gap">｜</span><span><a href="/blogs/category/杂">
+                              <span class="gap">｜</span><span><a >
                                 {{ range $k, $v := .Tags }}
                                 {{ if gt $k 2 }}{{ break }}{{ end }}
                                 <a class="ts-text is-description is-undecorated has-truncated" href="{{ $.URL.RelativeRoot }}tag/{{ .Slug }}" title="{{ .Name }}">#{{ .Name }}</a>
                                 {{ end }}
                               </a></span>
                               <!-- ｜<span>回复（4）</span> -->
-                              <span class="gap">｜</span><span><a href="{{ $.URL.RelativeRoot }}post/{{ .Slug }}" title="查看全文">「全文」</a></span>
+                              <span class="gap">｜</span><span><a href="{{ $.URL.RelativeRoot }}post/{{ .Slug }}">「{{ __ "post_content" }}」</a></span>
                           </p>
                     </div>
               </div>

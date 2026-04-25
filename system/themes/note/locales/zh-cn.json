@@ -3,6 +3,8 @@
   "filter_author": "仅显示作者发布的文章：",
   "filter_date": "仅显示日期的文章：",
 
+  "post_content": "全文",
+
   "button_resetfilter": "重置过滤器",
   "button_menu": "菜单",
   "button_close": "关闭",

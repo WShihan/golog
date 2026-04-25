@@ -56,7 +56,7 @@
     --toc-width: 100vw;
     --toc-height: 100vh;
     --footer-icon-size: 14px;
-    --footer-padding-size: 3em;
+    --footer-padding-size: 1em;
     --footer-icon-size: 16px;
     --nav-mobile-display: flex;
     --note-body-gap: 6em;
@@ -89,7 +89,7 @@
     --container-margin: 0px;
     --toc-width: 100vw;
     --toc-height: 100vh;
-    --footer-padding-size: 3em;
+    --footer-padding-size: 1em;
     --footer-icon-size: 11.2px;
     --nav-mobile-display: flex;
     --note-top-height: 3em;

@@ -3,6 +3,8 @@
   "filter_author": "Show only posts by the author:",
   "filter_date": "Show only posts from the date:",
 
+  "post_content": "Full Content",
+
   "button_resetfilter": "Reset Filter",
   "button_menu": "Menu",
   "button_close": "Close",

@@ -3,6 +3,8 @@
   "filter_author": "只顯示指定作者的文章：",
   "filter_date": "只顯示指定日期的文章：",
 
+  "post_content": "全文",
+
   "button_resetfilter": "重設條件",
   "button_menu": "選單",
   "button_close": "關閉",
