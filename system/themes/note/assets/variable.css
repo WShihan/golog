@@ -27,7 +27,7 @@
   --toc-height: 90vh;
   --border-color: rgba(177, 193, 220, 0.342);
   --note-top-height: 5em;
-  --note-body-gap: 5em;
+  --note-body-gap: 5em 0.5em 0em;
   --note-bottom: 1em;
   --note-bottom-height: 3em;
   --side-bar-bg: #175fab;
@@ -42,6 +42,7 @@
   --sider-bg-color: rgba(231, 235, 240, 0.5);
   --content-h-padding: 2em;
   --link-visited: #6095cda3;
+  --notetop-radius: 0.3em 0.3em 0em 0em;
 }
 
 @media (min-width: 768px) and (max-width: 1024px) {
@@ -59,7 +60,7 @@
     --footer-padding-size: 1em;
     --footer-icon-size: 16px;
     --nav-mobile-display: flex;
-    --note-body-gap: 6em;
+    --note-body-gap: 6em 1.5em 0em;
   }
 }
 
@@ -93,10 +94,12 @@
     --footer-icon-size: 11.2px;
     --nav-mobile-display: flex;
     --note-top-height: 3em;
-    --note-body-gap: 3em;
+    --note-body-gap: 3em 1em 0em;
     --note-bottom: 0em;
     --note-bottom-height: 1.5em;
     --content-h-padding: 0.5em;
+    --notetop-radius: 0em 0em 0em 0em;
+
   }
 }
 

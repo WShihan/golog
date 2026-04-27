@@ -17,7 +17,7 @@
   --toc-height: 90vh;
   --border-color: rgba(177, 193, 220, 0.342);
   --note-top-height: 5em;
-  --note-body-gap: 0em;
+  --note-body-gap: 0em 1.5em 0em;
   --note-bottom: 1em;
   --note-bottom-height: 1em;
   --side-bar-bg: #175fab;
@@ -49,7 +49,7 @@
     --footer-padding-size: 1em;
     --footer-icon-size: 16px;
     --nav-mobile-display: flex;
-    --note-body-gap: 3em;
+    --note-body-gap: 3em 1em 0em;
   }
 }
 
@@ -83,7 +83,7 @@
     --footer-icon-size: 11.2px;
     --nav-mobile-display: flex;
     --note-top-height: 3em;
-    --note-body-gap: 0em;
+    --note-body-gap: 0em 1.5em 0em;
     --note-bottom: 0em;
     --note-bottom-height: 1.5em;
     --content-h-padding: 0.5em;

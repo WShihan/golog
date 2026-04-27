@@ -167,7 +167,7 @@ section {
 }
 
 .container .note-body .note-body-inner {
-  padding: var(--note-body-gap) 0.5em 0;
+  padding: var(--note-body-gap);
 }
 
 .container .note-bottom {
