@@ -201,12 +201,35 @@
      =============================== */
 
   function initMobileFilters() {
-    // Close filter <details> on mobile by default
-    if (window.innerWidth <= 768) {
-      document.querySelectorAll(".admin-filter-details").forEach(function (el) {
-        el.removeAttribute("open");
-      });
-    }
+    if (window.innerWidth > 768) return;
+
+    document.querySelectorAll(".admin-filter-details").forEach(function (el) {
+      // Close by default on mobile
+      el.removeAttribute("open");
+
+      // Move the filter form into the content area, after the page title
+      var form = el.closest("form");
+      if (!form) return;
+
+      // Find the title row or header in the content container
+      var container = document.getElementById("content-container");
+      if (!container) return;
+
+      // Try to find the first major heading: .ts-grid.is-middle-aligned (posts),
+      // or .ts-header (tags, settings, etc.)
+      var insertAfter = container.querySelector(".ts-grid.is-middle-aligned");
+      if (!insertAfter) {
+        insertAfter = container.querySelector(".ts-header");
+      }
+
+      if (insertAfter) {
+        // Insert the filter form right after the title element
+        // The form's parent is the sidebar cell which will be hidden by CSS
+        el.style.marginBottom = "0.5rem";
+        el.style.marginTop = "0.5rem";
+        insertAfter.parentNode.insertBefore(form, insertAfter.nextSibling);
+      }
+    });
   }
 
   /* ===============================
