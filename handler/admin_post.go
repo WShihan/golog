@@ -10,6 +10,7 @@ import (
 
 	"golog/entity"
 	"golog/store"
+	"golog/util"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -30,8 +31,12 @@ func PostsView(c *gin.Context) {
 		countPerPage = 30
 		visibility   = entity.Visibility(c.Query("visibility"))
 	)
+	postType := c.Query("type")
+	if postType == "" {
+		postType = util.BlogType
+	}
 	q := &store.ListPostsQuery{
-		Type:          c.Query("type"),
+		Type:          postType,
 		Offset:        (page - 1) * countPerPage,
 		Limit:         countPerPage,
 		Title:         c.Query("title"),
