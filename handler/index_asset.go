@@ -30,5 +30,9 @@ func AssetView(c *gin.Context) {
 	}
 	cleanAsset := path.Clean("/" + asset)
 	cleanAsset = strings.TrimPrefix(cleanAsset, "/")
+	if cleanAsset == "" || cleanAsset == "." {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
 	c.FileFromFS(cleanAsset, http.FS(fsys))
 }

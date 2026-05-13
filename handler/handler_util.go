@@ -12,6 +12,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"golog/entity"
@@ -29,7 +30,7 @@ import (
 
 var (
 	regexpSlug       = regexp.MustCompile(`[^A-Za-z0-9\-._~!$&'()*+,;=\p{L}\p{N}]`)
-	throttleLimiters = make(map[string]*rate.Limiter)
+	throttleLimiters sync.Map
 )
 
 const (
@@ -39,16 +40,29 @@ const (
 )
 
 func throttle(c *gin.Context) {
-	limiter, ok := throttleLimiters[c.ClientIP()]
-	if !ok {
-		limiter = rate.NewLimiter(rate.Limit(2), 2)
-		throttleLimiters[c.ClientIP()] = limiter
+	ip := c.ClientIP()
+	limiterI, _ := throttleLimiters.Load(ip)
+	if limiterI == nil {
+		limiterI = rate.NewLimiter(rate.Limit(1), 1)
+		throttleLimiters.Store(ip, limiterI)
 	}
-	if limiter.Allow() {
+	if limiterI.(*rate.Limiter).Allow() {
 		c.Next()
 		return
 	}
 	c.AbortWithStatus(http.StatusTooManyRequests)
+}
+
+func init() {
+	go func() {
+		for {
+			time.Sleep(10 * time.Minute)
+			throttleLimiters.Range(func(key, _ any) bool {
+				throttleLimiters.Delete(key)
+				return true
+			})
+		}
+	}()
 }
 
 func toSlug(v string) string {

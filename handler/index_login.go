@@ -35,7 +35,7 @@ func LoginView(c *gin.Context) {
 
 type LoginRequest struct {
 	Email    string `form:"email" binding:"required,email" conform:"trim"`
-	Password string `form:"password" binding:"required,min=1,max=128"`
+	Password string `form:"password" binding:"required,min=8,max=128"`
 }
 
 func Login(c *gin.Context, req *LoginRequest) {

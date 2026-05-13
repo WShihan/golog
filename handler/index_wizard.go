@@ -50,7 +50,7 @@ type WizardRequest struct {
 	About       string `form:"about" binding:"omitempty"`
 	Start       int    `form:"start" binding:"omitempty"`
 	Email       string `form:"email" binding:"required,email" conform:"trim"`
-	Password    string `form:"password" binding:"required,min=1,max=128"`
+	Password    string `form:"password" binding:"required,min=8,max=128"`
 	Nickname    string `form:"nickname" binding:"required,min=1,max=32" conform:"trim"`
 	Timezone    int    `form:"timezone" binding:"min=-43200,max=50400"`
 	Locale      string `form:"locale" binding:"required"`
