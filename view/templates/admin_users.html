@@ -60,7 +60,7 @@
                     <td class="is-collapsed" data-label="{{ __ "users_email" }}">{{ .Email }}</td>
                     <td data-label="{{ __ "users_nickname" }}">{{ .Nickname }}</td>
                     <td class="is-collapsed" data-label="{{ __ "users_createdat" }}">{{ unix2date .CreatedAt }}</td>
-                    <td class="is-collapsed" data-label="">&nbsp;</td>
+                    <td class="is-collapsed user-actions" data-label="">
                         <a href="user/{{ .ID }}" class="ts-button is-small is-dense is-outlined">{{ __ "button_edit" }}</a>
                     </td>
                 </tr>

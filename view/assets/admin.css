@@ -1842,6 +1842,43 @@ a {
     white-space: nowrap;
   }
 
+  /* User list: action button at bottom-right of card */
+  .ts-table td.user-actions {
+    margin-top: 0.5rem;
+    text-align: right !important;
+  }
+
+  .ts-table td.user-actions::before {
+    display: none !important;
+  }
+
+  /* Navigation table: card layout on mobile */
+  .navigations-table tr {
+    padding: 1rem;
+  }
+
+  .navigations-table td {
+    padding: 0.35rem 0 !important;
+  }
+
+  .navigations-table td .ts-input {
+    margin-top: 0.15rem;
+  }
+
+  .navigations-table td:last-child {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem !important;
+    border-top: 1px solid var(--ts-gray-200);
+  }
+
+  .navigations-table td:last-child::before {
+    font-weight: 600;
+    color: var(--ts-gray-600);
+  }
+
   /* Navigation table - keep as horizontal scroll card */
   .ts-table.is-celled {
     display: table;

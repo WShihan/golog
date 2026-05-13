@@ -54,34 +54,34 @@
     <div class="ts-box">
         <form action="navigations/edit" method="POST">
             <input type="hidden" name="_csrf" value="{{ .CSRF }}" />
-            <table class="ts-table is-celled admin-table-scroll">
+            <table class="ts-table is-basic is-striped navigations-table">
                 <thead>
                     <tr>
                         <th style="width: 30%">{{ __ "navigations_name" }}</th>
                         <th>{{ __ "navigations_url" }}</th>
                         <th style="width: 80px">{{ __ "navigations_order" }}</th>
-                        <th class="is-collapsed"><span class="ts-icon is-trash-can-icon">{{ __ "navigations_delete"}}</span></th>
+                        <th class="is-collapsed"><span class="ts-icon is-trash-icon"></span></th>
                     </tr>
                 </thead>
                 <tbody>
                     {{ range .Navigations }}
                     <tr class="is-middle-aligned">
-                        <td class="is-compact" style="width: 30%">
+                        <td class="is-compact" data-label="{{ __ "navigations_name" }}">
                             <div class="ts-input">
                                 <input type="text" name="name[]" value="{{ .Name }}" required />
                             </div>
                         </td>
-                        <td class="is-compact">
+                        <td class="is-compact" data-label="{{ __ "navigations_url" }}">
                             <div class="ts-input">
                                 <input type="url" name="url[]" value="{{ .URL }}" required />
                             </div>
                         </td>
-                        <td class="is-compact" style="width: 100px">
+                        <td class="is-compact" data-label="{{ __ "navigations_order" }}">
                             <div class="ts-input">
                                 <input type="number" name="sequence[]" value="{{ .Sequence }}" required />
                             </div>
                         </td>
-                        <td class="is-compact is-middle-aligned is-center-aligned">
+                        <td class="is-compact is-middle-aligned is-center-aligned" data-label="{{ __ "navigations_delete" }}">
                             <label class="ts-checkbox is-large is-solo">
                                 <!-- keep them both input close/ no space so `.previousSibling` won't select text -->
                                 <input type="hidden" name="is_deleted[]" value="false" /><input type="checkbox" />
