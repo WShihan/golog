@@ -7,6 +7,10 @@
   <link rel="stylesheet" href="/assets/blog.css" />
   <!-- <script id="MathJax-script" async src="/assets/tex-mml-chtml.js"></script> -->
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  {{ if .Config.HighlightJS }}
+    <link rel="stylesheet" href="/assets/highlight.css" />
+    <script src="/assets/highlight.js"></script>
+  {{ end }}
   {{ .Config.InjectedPostStart | html}}
 {{ end }}
 {{ define "content" }}
